@@ -19,8 +19,10 @@ $message = "";
 // Traitement de la lettre
 if (isset($_POST['lettre'])) {
     $lettre = strtoupper($_POST['lettre']);
+
     if (!in_array($lettre, $_SESSION['lettres'])) {
         $_SESSION['lettres'][] = $lettre;
+
         if (!str_contains($_SESSION['mot'], $lettre)) {
             $_SESSION['erreurs']++;
             $message = "❌ Mauvaise lettre, Sang-de-Bourbe !";
@@ -33,6 +35,7 @@ if (isset($_POST['lettre'])) {
 // Mot affiché
 $motAffiche = "";
 $victoire = true;
+
 foreach (str_split($_SESSION['mot']) as $l) {
     if (in_array($l, $_SESSION['lettres'])) {
         $motAffiche .= $l . " ";
@@ -62,37 +65,51 @@ $defaite = $_SESSION['erreurs'] >= $maxErreurs;
     <!-- PENDU -->
     <div class="pendu">
         <?php
-            // Décalage pour que la potence s'affiche dès la 1ère erreur
-            $nbErreurs = $_SESSION['erreurs'] + 1;
-            $nbErreurs = min($nbErreurs, 7); // Max 7 images
-            $imgPendu = "images/pendu" . $nbErreurs . ".png";
+        // Décalage pour afficher la potence dès la 1ère erreur
+        $nbErreurs = $_SESSION['erreurs'] + 1;
+        $nbErreurs = min($nbErreurs, 7);
+        $imgPendu = "images/pendu" . $nbErreurs . ".png";
         ?>
         <img src="<?= $imgPendu ?>" class="machine">
     </div>
 
     <!-- INFOS -->
     <div class="infos">
+
         <div class="mot"><?= $motAffiche ?></div>
+
         <p class="message"><?= $message ?></p>
+
         <p>Lettres utilisées : <?= implode(", ", $_SESSION['lettres']) ?></p>
 
         <?php if (!$victoire && !$defaite): ?>
-            <form method="post">
-                <input type="text" name="lettre" maxlength="1" required pattern="[A-Za-z]">
-                <button>Valider</button>
+            <!-- CLAVIER A–Z -->
+            <form method="post" class="clavier">
+                <?php
+                foreach (range('A', 'Z') as $lettre) {
+                    $desactive = in_array($lettre, $_SESSION['lettres']) ? "disabled" : "";
+                    echo '<button type="submit" name="lettre" value="'.$lettre.'" '.$desactive.'>'
+                        .$lettre.
+                        '</button>';
+                }
+                ?>
             </form>
         <?php endif; ?>
 
         <?php if ($victoire): ?>
             <h2>🎉 Tu es un sorcier !</h2>
-            <form method="post"><button name="new">Nouvelle partie</button></form>
+            <form method="post">
+                <button name="new">Nouvelle partie</button>
+            </form>
         <?php elseif ($defaite): ?>
             <h2>💀 Défaite, Moldu...</h2>
             <p>Le mot était : <?= $_SESSION['mot'] ?></p>
-            <form method="post"><button name="new">Rejouer</button></form>
+            <form method="post">
+                <button name="new">Rejouer</button>
+            </form>
         <?php endif; ?>
-    </div>
 
+    </div>
 </div>
 
 <p><a href="admin.php">⚙️ Administration des mots</a></p>
