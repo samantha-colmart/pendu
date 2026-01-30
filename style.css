@@ -57,7 +57,6 @@ h1 {
     font-size: 36px;
     letter-spacing: 10px;
     margin: 30px 0;
-    white-space: nowrap; /* empêche le retour à la ligne */
 }
 
 .message {
